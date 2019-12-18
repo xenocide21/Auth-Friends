@@ -20,7 +20,7 @@ const handleSubmit = e =>{
         .post('/login', data)
         .then(r =>{
             console.log(r)
-            sessionStorage.setItem('username', r.data.username)
+            // sessionStorage.setItem('username', r.data.credentials.username)
             localStorage.setItem('token', r.data.payload)
             this.p.history.push('/protected')
         })

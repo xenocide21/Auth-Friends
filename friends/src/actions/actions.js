@@ -1,6 +1,4 @@
 import {axiosWithAuth} from "../helpers/AxiosWithAuth"
-// import unsplash from "../helpers/unsplash";
-// import axios from "axios";
 
 export const FETCH_FRIENDS_START = "FETCH_FRIENDS_START";
 export const FETCH_FRIENDS_SUCCESS = "FETCH_FRIENDS_SUCCESS";
@@ -20,7 +18,7 @@ export const fetchFriends=() =>{
     return dispatch => {
         dispatch({type: FETCH_FRIENDS_START});
         axiosWithAuth
-            .get("/api/photos/1")
+            .get("/api/friends/1")
             .then(response => {
                 console.log("response", response)
                 dispatch({type: FETCH_FRIENDS_SUCCESS, payload: response.data});
@@ -35,14 +33,14 @@ export const postFriends = ({title, url}) => {
     return dispatch => {
         dispatch({type: POST_FRIENDS_START});
         axiosWithAuth
-            .post("/api/photos/1", {
+            .post("/api/friends/1", {
                 photo_title: title,
                 photo_url: url
             })
             .then(response => {
                 dispatch({type: POST_FRIENDS_SUCCESS, payload: response.data});
                 axiosWithAuth
-                    .get("/api/photos/1")
+                    .get("/api/friends/1")
                     .then(response => {
                         dispatch({type: FETCH_FRIENDS_SUCCESS, payload: response.data});
                     })
@@ -60,8 +58,7 @@ export const editFriends = (id, data) => {
     return dispatch => {
         dispatch({type: EDIT_FRIENDS_START});
         axiosWithAuth
-            .put(`/photos/${id}`, data)
-            // ` /api/photos/1/${id}`, data)
+            .put(`/friends/${id}`, data)
             .then(response => {
                 dispatch({type: EDIT_FRIENDS_SUCCESS, payload: response.data});
                 dispatch(fetchFriends());
@@ -76,7 +73,7 @@ export const deleteFriends = (id) => {
     return dispatch => {
         dispatch({type: DELETE_FRIENDS_START});
         axiosWithAuth
-            .delete(`/api/photos/1/${id}`)
+            .delete(`/api/friends/1/${id}`)
             .then(response => {
                 dispatch({type: DELETE_FRIENDS_SUCCESS, payload: response.data});
                 dispatch(fetchFriends());
