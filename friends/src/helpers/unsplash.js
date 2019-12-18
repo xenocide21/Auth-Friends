@@ -12,7 +12,7 @@ export default function() {
     .create ({
         baseURL: 'https://api.unsplash.com/',
         headers: {
-            Authorization: getAuth()
+            authorization: getAuth()
         }
     })
 }

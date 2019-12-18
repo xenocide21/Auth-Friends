@@ -1,4 +1,4 @@
-import {axiosWithAuth} from "../helpers/AxiosWithAuth"
+import axios from 'axios'
 
 export const FETCH_FRIENDS_START = "FETCH_FRIENDS_START";
 export const FETCH_FRIENDS_SUCCESS = "FETCH_FRIENDS_SUCCESS";
@@ -17,8 +17,8 @@ export const EDIT_FRIENDS_FAILURE = "EDIT_FRIENDS_FAILURE";
 export const fetchFriends=() =>{
     return dispatch => {
         dispatch({type: FETCH_FRIENDS_START});
-        axiosWithAuth
-            .get("/api/friends/1")
+        axios
+            .get("/friends")
             .then(response => {
                 console.log("response", response)
                 dispatch({type: FETCH_FRIENDS_SUCCESS, payload: response.data});
@@ -29,18 +29,20 @@ export const fetchFriends=() =>{
     };
 }
 
-export const postFriends = ({title, url}) => {
+export const postFriends = ({id, name, age, email}) => {
     return dispatch => {
         dispatch({type: POST_FRIENDS_START});
-        axiosWithAuth
-            .post("/api/friends/1", {
-                photo_title: title,
-                photo_url: url
+        axios
+            .post("/friends/1", {
+                id: id,
+                name: name,
+                age: age,
+                email: email,
             })
             .then(response => {
                 dispatch({type: POST_FRIENDS_SUCCESS, payload: response.data});
-                axiosWithAuth
-                    .get("/api/friends/1")
+                axios
+                    .get("/friends/1")
                     .then(response => {
                         dispatch({type: FETCH_FRIENDS_SUCCESS, payload: response.data});
                     })
@@ -57,7 +59,7 @@ export const postFriends = ({title, url}) => {
 export const editFriends = (id, data) => {
     return dispatch => {
         dispatch({type: EDIT_FRIENDS_START});
-        axiosWithAuth
+        axios
             .put(`/friends/${id}`, data)
             .then(response => {
                 dispatch({type: EDIT_FRIENDS_SUCCESS, payload: response.data});
@@ -72,8 +74,8 @@ export const editFriends = (id, data) => {
 export const deleteFriends = (id) => {
     return dispatch => {
         dispatch({type: DELETE_FRIENDS_START});
-        axiosWithAuth
-            .delete(`/api/friends/1/${id}`)
+        axios
+            .delete(`/friends/1/${id}`)
             .then(response => {
                 dispatch({type: DELETE_FRIENDS_SUCCESS, payload: response.data});
                 dispatch(fetchFriends());
