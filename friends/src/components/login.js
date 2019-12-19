@@ -1,52 +1,29 @@
-import React, {useState} from 'react'
-import { axiosWithAuth } from '../helpers/AxiosWithAuth'
+import React from 'react'
 
-const Login = (p) => {
-    // const [err, setErr] = useState()
-    const [data, setData] = useState({
-        credentials: {
-            username: '',
-            password: ''
-        }
-    })
+export default class Login extends React.Component {
+    userRef = React.createRef()
+    passwordRef = React.createRef()
 
-    const handleChange = e => {
-        setData({...data, [e.target.name]: e.target.value})
+    onLogin = () => {
+        const username = this.userRef.current.value
+        const password = this.passwordRef.current.value
+        this.props.login(username, password)
     }
 
-const handleSubmit = e =>{
-    e.preventDefault()
-    axiosWithAuth()
-        .post('/login', data)
-        .then(r =>{
-            console.log(r)
-            // sessionStorage.setItem('username', r.data.credentials.username)
-            localStorage.setItem('token', r.data.payload)
-            p.history.push('/protected')
-        })
-        .catch(err =>{
-            console.log(err)
-        })
+    render() {
+        return (
+            <div>
+                <h1>Welcome</h1>
+                <form
+                    onSubmit={() => {
+                        this.onLogin()
+                    }}
+                >
+                    <input type="text" ref={this.userRef} />
+                    <input type="text" ref={this.passwordRef} />
+                    <button type="submit">Log In</button>
+                </form>
+            </div>
+        );
+    }
 }
-
-return(
-    <form className='form-container' onSubmit={handleSubmit}>
-        <h2>Please Log In</h2>
-        <div className='login-container'>
-            <input type='text'
-                   name='username'
-                   placeholder='username'
-                   value={data.username}
-                   onChange={handleChange}/>
-            <input type='text'
-                   name='password'
-                   placeholder='password'
-                   value={data.password}
-                   onChange={handleChange}/>
-            <button className="alt-button" type="submit">Sign In</button>
-        </div>
-    </form>
-)
-}
-
-export default Login

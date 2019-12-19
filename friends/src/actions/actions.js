@@ -1,88 +1,55 @@
 import axios from 'axios'
+import axiosWithAuth from '../helpers/AxiosWithAuth'
 
-export const FETCH_FRIENDS_START = "FETCH_FRIENDS_START";
-export const FETCH_FRIENDS_SUCCESS = "FETCH_FRIENDS_SUCCESS";
-export const FETCH_FRIENDS_FAILURE = "FETCH_FRIENDS_FAILURE";
-export const POST_FRIENDS_START = "POST_FRIENDS_START";
-export const POST_FRIENDS_SUCCESS = "POST_FRIENDS_SUCCESS";
-export const POST_FRIENDS_FAILURE = "POST_FRIENDS_FAILURE";
-export const DELETE_FRIENDS_START = "DELETE_FRIENDS_START";
-export const DELETE_FRIENDS_SUCCESS = "DELETE_FRIENDS_SUCCESS";
-export const DELETE_FRIENDS_FAILURE = "DELETE_FRIENDS_FAILURE";
-export const EDIT_FRIENDS_START = "EDIT_FRIENDS_START";
-export const EDIT_FRIENDS_SUCCESS = "EDIT_FRIENDS_SUCCESS";
-export const EDIT_FRIENDS_FAILURE = "EDIT_FRIENDS_FAILURE";
+export const FETCH_FRIENDS_START = 'FETCH_FRIENDS_START';
+export const FETCH_FRIENDS_SUCCESS = 'FETCH_FRIENDS_SUCCESS';
+export const FETCH_FRIENDS_FAILURE = 'FETCH_FRIENDS_FAILURE';
+export const ADD_NEW_FRIEND = 'ADD_NEW_FRIEND';
+export const ADD_NEW_FRIEND_SUCCESS = 'ADD_NEW_FRIEND_SUCCESS';
+export const UPDATE_FRIEND = 'UPDATE_FRIEND';
+export const DELETE_FRIEND = 'DELETE_FRIEND';
+export const DELETE_FRIEND_SUCCESS = 'DELETE_FRIEND_SUCCESS';
+export const LOGIN = 'LOGIN';
 
-
-export const fetchFriends=() =>{
-    return dispatch => {
-        dispatch({type: FETCH_FRIENDS_START});
-        axios
-            .get("/friends")
-            .then(response => {
-                console.log("response", response)
-                dispatch({type: FETCH_FRIENDS_SUCCESS, payload: response.data});
+export const fetchFriends = () => dispatch => {
+    dispatch({ type: FETCH_FRIENDS_START });
+    axiosWithAuth()
+        .get('http://localhost:5000/api/friends')
+        .then(res => {
+            dispatch({ type: FETCH_FRIENDS_SUCCESS, payload: res.data });
+        })
+        .catch(err =>
+            dispatch({
+                type: FETCH_FRIENDS_FAILURE,
+                payload: err.response
             })
-            .catch(error => {
-                dispatch({type: FETCH_FRIENDS_FAILURE, payload: error});
-            });
-    };
-}
+        );
+};
 
-export const postFriends = ({id, name, age, email}) => {
-    return dispatch => {
-        dispatch({type: POST_FRIENDS_START});
-        axios
-            .post("/friends/1", {
-                id: id,
-                name: name,
-                age: age,
-                email: email,
-            })
-            .then(response => {
-                dispatch({type: POST_FRIENDS_SUCCESS, payload: response.data});
-                axios
-                    .get("/friends/1")
-                    .then(response => {
-                        dispatch({type: FETCH_FRIENDS_SUCCESS, payload: response.data});
-                    })
-                    .catch(error => {
-                        dispatch({type: FETCH_FRIENDS_FAILURE, payload: error});
-                    });
-            })
-            .catch(error => {
-                dispatch({type: POST_FRIENDS_FAILURE, payload: error});
-            });
-    };
-}
+export const login = (username, password) => dispatch => {
+    const credentials = { username, password };
+    axios
+        .post('http://localhost:5000/api/login', credentials)
+        .then(res => {
+            localStorage.setItem('token', res.data.payload);
+        })
+        .catch(err => console.log(`Could not login - ${err.error}`));
+};
 
-export const editFriends = (id, data) => {
-    return dispatch => {
-        dispatch({type: EDIT_FRIENDS_START});
-        axios
-            .put(`/friends/${id}`, data)
-            .then(response => {
-                dispatch({type: EDIT_FRIENDS_SUCCESS, payload: response.data});
-                dispatch(fetchFriends());
-            })
-            .catch(error => {
-                dispatch({type: EDIT_FRIENDS_FAILURE, payload: error});
-            });
-    };
-}
+export const addFriend = friend => dispatch => {
+    dispatch({ type: ADD_NEW_FRIEND });
+    axiosWithAuth()
+        .post('http://localhost:5000/api/friends', friend)
+        .then(res => dispatch({ type: ADD_NEW_FRIEND_SUCCESS, payload: res.data }))
+        .catch(err => console.log(`Could not add friend: ${err.message}`));
+};
 
-export const deleteFriends = (id) => {
-    return dispatch => {
-        dispatch({type: DELETE_FRIENDS_START});
-        axios
-            .delete(`/friends/1/${id}`)
-            .then(response => {
-                dispatch({type: DELETE_FRIENDS_SUCCESS, payload: response.data});
-                dispatch(fetchFriends());
-            })
-            .catch(error => {
-                dispatch({type: DELETE_FRIENDS_FAILURE, payload: error});
-            });
-    };
-}
-
+export const deleteFriend = id => dispatch => {
+    dispatch({ type: DELETE_FRIEND });
+    axiosWithAuth()
+        .delete(`http://localhost:5000/api/friends/${id}`)
+        .then(res => dispatch({ type: DELETE_FRIEND_SUCCESS, payload: res.data }))
+        .catch(err => {
+            console.log(`Could not delete friend: ${err.message}`);
+        });
+};
